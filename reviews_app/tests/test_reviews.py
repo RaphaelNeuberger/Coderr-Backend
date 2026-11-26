@@ -109,6 +109,16 @@ class ReviewUpdateDeleteTests(ReviewTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Review.objects.exists())
 
+    def test_write_requests_require_authentication(self):
+        """Anonymous users get 401 for create, update and delete."""
+        create = self.client.post(LIST_URL, {"business_user": 1})
+        patch = self.client.patch(self.url, {"rating": 1})
+        delete = self.client.delete(self.url)
+        for response in (create, patch, delete):
+            self.assertEqual(response.status_code,
+                             status.HTTP_401_UNAUTHORIZED)
+        self.assertTrue(Review.objects.exists())
+
     def test_unknown_review_returns_404(self):
         """An unknown id leads to 404."""
         self.client.force_authenticate(self.customer)

@@ -121,6 +121,12 @@ class OrderUpdateTests(OrderTestCase):
                                      {"status": "completed"})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_update_requires_authentication(self):
+        """Anonymous users get 401."""
+        response = self.client.patch(self.order_url(),
+                                     {"status": "completed"})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_unknown_order_returns_404(self):
         """An unknown order leads to 404."""
         self.client.force_authenticate(self.business)

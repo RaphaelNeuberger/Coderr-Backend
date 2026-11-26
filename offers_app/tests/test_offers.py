@@ -199,6 +199,14 @@ class OfferDetailTests(APITestCase):
         self.assertEqual(patch.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(delete.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_anonymous_cannot_patch_or_delete(self):
+        """Anonymous users get 401 and the offer stays."""
+        patch = self.client.patch(detail_url(self.offer), {"title": "X"})
+        delete = self.client.delete(detail_url(self.offer))
+        self.assertEqual(patch.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(delete.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertTrue(Offer.objects.exists())
+
     def test_owner_deletes_offer(self):
         """The owner deletes the offer and gets 204."""
         self.client.force_authenticate(self.business)

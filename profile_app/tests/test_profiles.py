@@ -88,6 +88,11 @@ class ProfileDetailTests(APITestCase):
         response = self.client.patch(self.url, {"location": "Hamburg"})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_patch_requires_authentication(self):
+        """Anonymous users get 401."""
+        response = self.client.patch(self.url, {"location": "Hamburg"})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_patch_rejects_used_email(self):
         """An email address of another account leads to 400."""
         self.client.force_authenticate(self.business)
