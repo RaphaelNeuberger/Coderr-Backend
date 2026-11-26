@@ -10,6 +10,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from profile_app.api.serializers import ProfileDetailSerializer
 from profile_app.models import UserProfile
 
 TEMP_MEDIA = tempfile.mkdtemp()
@@ -123,6 +124,15 @@ class ProfileListTests(APITestCase):
         self.client.force_authenticate(None)
         response = self.client.get(reverse("profile-customer-list"))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_serializer_replaces_none_with_empty_string(self):
+        """Text fields that hold ``None`` are returned as empty strings."""
+        profile = self.business.profile
+        profile.location = None
+        profile.user.first_name = None
+        data = ProfileDetailSerializer(profile).data
+        self.assertEqual(data["location"], "")
+        self.assertEqual(data["first_name"], "")
 
     def test_profile_str_contains_username(self):
         """The string representation shows username and type."""
