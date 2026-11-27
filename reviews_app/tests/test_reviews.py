@@ -126,6 +126,14 @@ class ReviewUpdateDeleteTests(ReviewTestCase):
                                      {"rating": 2})
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_timestamps_use_utc_format(self):
+        """Timestamps end with ``Z`` like in the API documentation."""
+        self.client.force_authenticate(self.customer)
+        response = self.client.get(LIST_URL)
+        review = response.data[0]
+        self.assertTrue(review["created_at"].endswith("Z"))
+        self.assertTrue(review["updated_at"].endswith("Z"))
+
     def test_review_str(self):
         """The string representation shows both users and the rating."""
         self.assertEqual(str(self.review), "cust -> biz (4)")

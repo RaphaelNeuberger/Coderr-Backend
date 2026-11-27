@@ -45,6 +45,13 @@ class OrderListCreateTests(OrderTestCase):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(len(response.data), expected)
 
+    def test_list_timestamps_use_utc_format(self):
+        """Timestamps end with ``Z`` like in the API documentation."""
+        self.client.force_authenticate(self.customer)
+        order = self.client.get(LIST_URL).data[0]
+        self.assertTrue(order["created_at"].endswith("Z"))
+        self.assertTrue(order["updated_at"].endswith("Z"))
+
     def test_list_requires_authentication(self):
         """Anonymous users get 401."""
         response = self.client.get(LIST_URL)
